@@ -118,6 +118,24 @@ def pause_screen():
                 pygame.quit()
             if event.type == pygame.KEYUP:
                 waiting = False
+# Пауза
+def pause():
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        pause_screen()
+
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_ESCAPE]:
+            paused = False
+
+        pygame.display.update()
+        clock.tick(15)
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -172,28 +190,12 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
 
+        # Пауза по нажатию backspace
+        # keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_BACKSPACE]:
+            pause()
 
-#def pause():
-#    paused = True
-#    while paused:
-#        for event in pygame.event.get():
-#            if event.type == pygame.QUIT:
-#                pygame.quit()
-#                quit()
 
-#        pause_screen()
-
- #       keys = pygame.key.get_pressed()
- #       if keys[pygame.K_p]:
- #           paused = False
-
-  #      pygame.display.update()
-  #      clock.tick(15)
-
-            # Пауза по нажатию 1
-  #  keystate = pygame.key.get_pressed()
-  # if keystate[pygame.K_p]:
-  #      pause()
 
     def powerup(self):
         self.power += 1

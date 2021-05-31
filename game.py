@@ -1,8 +1,9 @@
-# Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> licensed under CC-BY-3
-# Art from Kenney.nl
 import pygame
 import random
 from os import path
+import shelve
+from save import *
+from highscore import *
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -11,7 +12,7 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 WIDTH = 480
 HEIGHT = 600
 FPS = 60
-POWERUP_TIME = 5000
+POWERUP_TIME = 3000
 
 # Задаем цвета
 WHITE = (255, 255, 255)
@@ -30,7 +31,7 @@ clock = pygame.time.Clock()
 
 font_name = pygame.font.match_font('arial')
 
-
+# Рендеринг текста
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, WHITE)
@@ -44,7 +45,7 @@ def newmob():
     all_sprites.add(m)
     mobs.add(m)
 
-
+# Здоровье
 def draw_shield_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
@@ -56,7 +57,7 @@ def draw_shield_bar(surf, x, y, pct):
     pygame.draw.rect(surf, GREEN, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
-
+# Жизни
 def draw_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
@@ -64,13 +65,14 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.y = y
         surf.blit(img, img_rect)
 
-
+# Стартовый экран
 def show_go_screen():
     screen.blit(background, background_rect)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4)
     draw_text(screen, "Arrow keys move, Space to fire", 22,
               WIDTH / 2, HEIGHT / 2)
-    draw_text(screen, "Press any key to begin", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    draw_text(screen, "Press any key to begin", 18, WIDTH / 2, HEIGHT * 2 / 3)
+    draw_text(screen, "Press escape to exit", 17, WIDTH / 2, HEIGHT * 3 / 4)
     pygame.display.flip()
     waiting = True
     while waiting:
@@ -80,6 +82,59 @@ def show_go_screen():
                 pygame.quit()
             if event.type == pygame.KEYUP:
                 waiting = False
+
+# Экран при проигрыше
+def gameover_screen():
+    screen.blit(background, background_rect)
+    draw_text(screen, "Game over!", 64, WIDTH / 2, HEIGHT / 4)
+    message = 'Youre score: %d' % score
+    draw_text(screen, message, 22,
+                WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, "Press any key to begin new game", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
+
+# Экран паузы
+def pause_screen():
+    screen.blit(background, background_rect)
+    draw_text(screen, "Paused", 64, WIDTH / 2, HEIGHT / 4)
+    message = 'Youre score: %d' % score
+    draw_text(screen, message, 22,
+              WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, "Press enter to continue", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
+# Пауза
+def pause():
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        pause_screen()
+
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_ESCAPE]:
+            paused = False
+
+        pygame.display.update()
+        clock.tick(15)
 
 
 class Player(pygame.sprite.Sprite):
@@ -101,6 +156,11 @@ class Player(pygame.sprite.Sprite):
         self.hide_timer = pygame.time.get_ticks()
         self.power = 1
         self.power_time = pygame.time.get_ticks()
+# Сохранения
+        self.save_data = Save()
+        self.high_scores = HighScore(self.save_data.get('hs'))
+       # self.save_data.add('hs', {})
+       # print(self.save_data.get('hs'))
 
     def update(self):
         # тайм-аут для бонусов
@@ -108,12 +168,14 @@ class Player(pygame.sprite.Sprite):
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
 
-        # РїРѕРєР°Р·Р°С‚СЊ, РµСЃР»Рё СЃРєСЂС‹С‚Рѕ
+        #
         if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:
             self.hidden = False
             self.rect.centerx = WIDTH / 2
             self.rect.bottom = HEIGHT - 10
 
+
+        # Управление игроком
         self.speedx = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
@@ -127,6 +189,13 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+
+        # Пауза по нажатию backspace
+        # keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_BACKSPACE]:
+            pause()
+
+
 
     def powerup(self):
         self.power += 1
@@ -255,16 +324,14 @@ class Explosion(pygame.sprite.Sprite):
 
 
 # Загрузка всей игровой графики
-background = pygame.image.load(path.join(img_dir, "starfield.png")).convert()
+background = pygame.image.load(path.join(img_dir, "background1.png")).convert()
 background_rect = background.get_rect()
-player_img = pygame.image.load(path.join(img_dir, "playerShip1_orange.png"))
+player_img = pygame.image.load(path.join(img_dir, "spiked ship 3. small.blue_.PNG"))
 player_mini_img = pygame.transform.scale(player_img, (25, 19))
 player_mini_img.set_colorkey(BLACK)
 bullet_img = pygame.image.load(path.join(img_dir, "laserRed16.png")).convert()
 meteor_images = []
-meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_med1.png',
-               'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
-               'meteorBrown_tiny1.png']
+meteor_list = ['Asteroid2.png', 'asteroid-big.png', 'asteroid-small.png']
 for img in meteor_list:
     meteor_images.append(pygame.image.load(path.join(img_dir, img)).convert())
 
@@ -291,8 +358,8 @@ powerup_images['gun'] = pygame.image.load(path.join(img_dir, 'bolt_gold.png'))
 
 # Загрузка мелодий игры
 shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'pew.wav'))
-shield_sound = pygame.mixer.Sound(path.join(snd_dir, 'pow4.wav'))
-power_sound = pygame.mixer.Sound(path.join(snd_dir, 'pow5.wav'))
+shield_sound = pygame.mixer.Sound(path.join(snd_dir, 'pow5.wav'))
+power_sound = pygame.mixer.Sound(path.join(snd_dir, 'pow4.wav'))
 expl_sounds = []
 for snd in ['expl3.wav', 'expl6.wav']:
     expl_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
@@ -375,6 +442,7 @@ while running:
             player.shield += random.randrange(10, 30)
             if player.shield >= 100:
                 player.shield = 100
+                shield_sound.play()
         if hit.type == 'gun':
             player.powerup()
             power_sound.play()
@@ -382,6 +450,7 @@ while running:
     # Если игрок умер, игра окончена
     if player.lives == 0 and not death_explosion.alive():
         game_over = True
+        gameover_screen()
 
 
 
@@ -395,5 +464,10 @@ while running:
                player_mini_img)
     # После отрисовки всего переворачиваем экран
     pygame.display.flip()
+
+    # Esc для выхода из игры
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_ESCAPE]:
+        pygame.quit()
 
 pygame.quit()
