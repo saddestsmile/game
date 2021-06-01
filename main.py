@@ -108,7 +108,7 @@ def pause_screen():
     message = 'Youre score: %d' % score
     draw_text(screen, message, 22,
               WIDTH / 2, HEIGHT / 2)
-    draw_text(screen, "Press enter to continue", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    draw_text(screen, "Press SHIFT to continue", 18, WIDTH / 2, HEIGHT * 3 / 4)
     pygame.display.flip()
     waiting = True
     while waiting:
@@ -130,11 +130,11 @@ def pause():
         pause_screen()
 
         keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_ESCAPE]:
+        if keystate[pygame.K_LSHIFT]:
             paused = False
 
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(FPS)
 
 
 class Player(pygame.sprite.Sprite):
