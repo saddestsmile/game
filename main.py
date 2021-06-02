@@ -1,9 +1,7 @@
 import pygame
 import random
 from os import path
-import shelve
-from save import *
-from highscore import *
+
 
 # Директории, в которых хранятся изображения и звуки, используемые в игре
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -13,7 +11,7 @@ WIDTH = 480
 HEIGHT = 600
 FPS = 60
 POWERUP_TIME = 3000
-HS_FILE = "highscore.txt"
+HS_FILE = "high_score.txt"
 
 # Задаем цвета
 WHITE = (255, 255, 255)
@@ -32,24 +30,28 @@ clock = pygame.time.Clock()
 
 font_name = pygame.font.match_font('arial')
 
+
 class Data:
+
     def __init__(self):
         self.load_data()
 # Загрузка таблицы рекордов
+
     def load_data(self):
         self.dir = path.dirname(__file__)
         with open(path.join(self.dir, HS_FILE), 'w') as f:
             try:
-                self.highscore = int(f.read())
+                self.high_score = int(f.read())
             except:
-                self.highscore = 0
+                self.high_score = 0
 
 
 # Рендеринг текста
 def draw_text(surf, text, size, x, y):
     # Выбор кроссплатформенного шрифта для отображения счета
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, WHITE) ## True обозначает шрифт, который нужно сглаживать.
+    text_surface = font.render(text, True, WHITE)
+    # True обозначает шрифт, который нужно сглаживать.
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
@@ -60,17 +62,19 @@ def newmob():
     all_sprites.add(m)
     mobs.add(m)
 
+
 # Здоровье
 def draw_shield_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
-    BAR_LENGTH = 100
-    BAR_HEIGHT = 10
-    fill = (pct / 100) * BAR_LENGTH
-    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
-    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    bar_length = 100
+    bar_height = 10
+    fill = (pct / 100) * bar_length
+    outline_rect = pygame.Rect(x, y, bar_length, bar_height)
+    fill_rect = pygame.Rect(x, y, fill, bar_height)
     pygame.draw.rect(surf, GREEN, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
+
 
 # Жизни
 def draw_lives(surf, x, y, lives, img):
@@ -79,6 +83,7 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.x = x + 30 * i
         img_rect.y = y
         surf.blit(img, img_rect)
+
 
 # Стартовый экран
 def show_go_screen():
@@ -99,13 +104,13 @@ def show_go_screen():
             if event.type == pygame.KEYUP:
                 waiting = False
 
+
 # Экран при проигрыше
-def gameover_screen():
+def game_over_screen():
     screen.blit(background, background_rect)
     draw_text(screen, "Game over!", 64, WIDTH / 2, HEIGHT / 4)
     message = 'Your score: %d' % score
-    draw_text(screen, message, 22,
-                WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, message, 22, WIDTH / 2, HEIGHT / 2)
     draw_text(screen, "Press any key to begin new game", 18, WIDTH / 2, HEIGHT * 3 / 4)
     pygame.display.flip()
     waiting = True
@@ -117,11 +122,12 @@ def gameover_screen():
             if event.type == pygame.KEYUP:
                 waiting = False
 
+
 # Экран паузы
 def pause_screen():
     screen.blit(background, background_rect)
     draw_text(screen, "Paused", 64, WIDTH / 2, HEIGHT / 4)
-    message = 'Youre score: %d' % score
+    message = 'Your score: %d' % score
     draw_text(screen, message, 22,
               WIDTH / 2, HEIGHT / 2)
     draw_text(screen, "Press SHIFT to continue", 18, WIDTH / 2, HEIGHT * 3 / 4)
@@ -134,6 +140,8 @@ def pause_screen():
                 pygame.quit()
             if event.type == pygame.KEYUP:
                 waiting = False
+
+
 # Пауза
 def pause():
     paused = True
@@ -200,10 +208,10 @@ class Player(pygame.sprite.Sprite):
         self.power_time = pygame.time.get_ticks()
 
 # Сохранения
-        #self.save_data = Save()
-        #self.high_scores = HighScore(self.save_data.get('hs'))
-        #self.save_data.add('hs', {})
-        #print(self.save_data.get('hs'))
+        # self.save_data = Save()
+        # self.high_scores = HighScore(self.save_data.get('hs'))
+        # self.save_data.add('hs', {})
+        # print(self.save_data.get('hs'))
 
     def update(self):
         # тайм-аут для бонусов
@@ -216,11 +224,9 @@ class Player(pygame.sprite.Sprite):
             self.hidden = False
             self.rect.centerx = WIDTH / 2
             self.rect.bottom = HEIGHT - 10
-
-
         # Управление игроком
         self.speedx = 0
-        #по умолчанию делает игрока статичным на экране,
+        # по умолчанию делает игрока статичным на экране,
         # тогда мы должны проверить, выполняется ли обработка событий для клавиш со стрелками
 
         # вернет список клавиш, которые были нажаты в этот момент
@@ -245,7 +251,6 @@ class Player(pygame.sprite.Sprite):
         # keystate = pygame.key.get_pressed()
         if keystate[pygame.K_BACKSPACE]:
             pause()
-
 
     def shoot(self):
         # чтобы указать пуле, где появиться
@@ -279,11 +284,9 @@ class Player(pygame.sprite.Sprite):
                 shoot_sound.play()
                 missile_sound.play()
 
-
     def powerup(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
-
 
     def hide(self):
         self.hidden = True
@@ -311,11 +314,12 @@ class Mob(pygame.sprite.Sprite):
         # добавляем вращения астероидам
         self.rot = 0
         self.rot_speed = random.randrange(-8, 8)
-        self.last_update = pygame.time.get_ticks() # время, когда должно произойти вращение
+        self.last_update = pygame.time.get_ticks()
+        # время, когда должно произойти вращение
 
     def rotate(self):
         now = pygame.time.get_ticks()
-        if now - self.last_update > 50: # в милисекундах
+        if now - self.last_update > 50:  # в милисекундах
             self.last_update = now
             self.rot = (self.rot + self.rot_speed) % 360
             new_image = pygame.transform.rotate(self.image_orig, self.rot)
@@ -482,7 +486,6 @@ while running:
         # Переменная для счета
         score = 0
 
-
     # Держим цикл на правильной скорости
     clock.tick(FPS)
     # Ввод процесса (события)
@@ -517,7 +520,6 @@ while running:
         newmob()
     # указанный выше цикл снова создаст количество убитых мобов
 
-
     #  Проверка не ударил ли моб игрока
     hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
     # возвращает список, True заставляет элемент моба исчезнуть
@@ -550,15 +552,14 @@ while running:
     if player.lives == 0 and not death_explosion.alive():
         running = False
         # menu_display = True
-        gameover_screen()
-
+        game_over_screen()
 
     # Рендеринг
     screen.fill(BLACK)
     screen.blit(background, background_rect)
 
     all_sprites.draw(screen)
-    draw_text(screen, str(score), 18, WIDTH / 2, 10) # 10px вниз от экрана
+    draw_text(screen, str(score), 18, WIDTH / 2, 10)  # 10px вниз от экрана
     draw_shield_bar(screen, 5, 5, player.shield)
     # Рисуем жизни
     draw_lives(screen, WIDTH - 100, 5, player.lives, player_mini_img)
