@@ -454,7 +454,7 @@ running = True
 while running:
     if menu_display:
         show_go_screen()
-        pygame.time.wait(3000)
+        pygame.time.wait(300)
 
         # останавливает музыку меню
         pygame.mixer.music.stop()
