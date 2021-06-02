@@ -3,6 +3,7 @@ import shelve
 class Save:
     def __init__(self):
         self.file = shelve .open('data')
+        
 
     def save(self):
         self.file['usr_y'] = p.usr_y
