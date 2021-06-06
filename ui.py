@@ -2,6 +2,8 @@ from tkinter import *
 import pygame
 import random
 from os import path
+import math
+import arcade
 
 
 def click_button1():

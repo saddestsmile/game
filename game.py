@@ -7,6 +7,8 @@ from os import path
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
 
+
+# Размеры окна
 WIDTH = 480
 HEIGHT = 600
 FPS = 60
