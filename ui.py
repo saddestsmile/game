@@ -1,16 +1,16 @@
 from tkinter import *
-import pygame
-import random
-from os import path
-import math
-import arcade
 
 
 def click_button1():
+    import pygame
+    import random
+    from os import path
+
     # Директории, в которых хранятся изображения и звуки, используемые в игре
     img_dir = path.join(path.dirname(__file__), 'img')
     snd_dir = path.join(path.dirname(__file__), 'snd')
 
+    # Размеры окна
     WIDTH = 480
     HEIGHT = 600
     FPS = 60

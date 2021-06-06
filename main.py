@@ -160,7 +160,7 @@ def pause():
         pygame.display.update()
         clock.tick(FPS)
 
-
+# Класс, описывающий взрывы
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, center, size):
         pygame.sprite.Sprite.__init__(self)
@@ -186,7 +186,7 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect.center = center
 
 
-# определяет спрайты игрока
+# определяет спрайт игрока
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
