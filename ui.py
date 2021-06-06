@@ -957,12 +957,14 @@ def click_button2():
 
 root = Tk()
 root.title("Games")
-root.geometry("300x250")
+root.geometry("150x100")
 
+# Кнопка выбора первой игры
 btn1 = Button(text="Game 1", background="#555", foreground="#ccc",
              padx="20", pady="8", font="16", command=click_button1)
 btn1.pack()
 
+# Кнопка выбора второй игры
 btn2 = Button(text="Game 2", background="#555", foreground="#ccc",
              padx="20", pady="8", font="16", command=click_button2)
 btn2.pack()
