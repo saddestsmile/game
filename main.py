@@ -31,19 +31,19 @@ clock = pygame.time.Clock()
 font_name = pygame.font.match_font('arial')
 
 
-class Data:
+# class Data:
 
-    def __init__(self):
-        self.load_data()
+#    def __init__(self):
+#        self.load_data()
 # Загрузка таблицы рекордов
 
-    def load_data(self):
-        self.dir = path.dirname(__file__)
-        with open(path.join(self.dir, HS_FILE), 'w') as f:
-            try:
-                self.high_score = int(f.read())
-            except:
-                self.high_score = 0
+#   def load_data(self):
+#       self.dir = path.dirname(__file__)
+#       with open(path.join(self.dir, HS_FILE), 'w') as f:
+#           try:
+#               self.high_score = int(f.read())
+#           except:
+#               self.high_score = 0
 
 
 # Рендеринг текста
@@ -359,7 +359,7 @@ class Pow(pygame.sprite.Sprite):
             self.kill()
 
 
-# определяет спрайты для пуль (лазеров)
+# определяет спрайты для пуль игрока
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -536,7 +536,7 @@ while running:
             player.lives -= 1
             player.shield = 100
 
-    # Проверка получения бонуса игроком
+# Проверка получения бонуса игроком
     hits = pygame.sprite.spritecollide(player, powerups, True)
     for hit in hits:
         if hit.type == 'shield':
