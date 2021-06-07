@@ -214,6 +214,9 @@ class Player(pygame.sprite.Sprite):
         # print(self.save_data.get('hs'))
 
     def update(self):
+        # перемещает спрайт с конкретной скоростью:
+        self.rect.x += self.speedx
+
         # тайм-аут для бонусов
         if self.power >= 2 and pygame.time.get_ticks() - self.power_time > POWERUP_TIME:
             self.power -= 1
@@ -239,7 +242,6 @@ class Player(pygame.sprite.Sprite):
         # выпускает лазеры по нажатию пробела
         if keystate[pygame.K_SPACE]:
             self.shoot()
-        self.rect.x += self.speedx
 
         # проверяет границы слева и справа
         if self.rect.right > WIDTH:
@@ -513,6 +515,8 @@ while running:
         # mobs.add(m)
         expl = Explosion(hit.rect.center, 'lg')
         all_sprites.add(expl)
+
+        # Шанс выпадения бонуса 10%
         if random.random() > 0.9:
             pow = Pow(hit.rect.center)
             all_sprites.add(pow)
