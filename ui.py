@@ -186,11 +186,13 @@ def click_button1():
             pygame.sprite.Sprite.__init__(self)
             self.image = pygame.transform.scale(player_img, (50, 38))
             self.image.set_colorkey(BLACK)
+            # Команда get_rect() оценивает изображение и высчитывает прямоугольник
             self.rect = self.image.get_rect()
             self.radius = 20
             # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
             self.rect.centerx = WIDTH / 2
             self.rect.bottom = HEIGHT - 10
+            # speedx отслеживает с какой скоротью игрок движется по оси x
             self.speedx = 0
             self.shield = 100
             self.shoot_delay = 250
@@ -292,6 +294,7 @@ def click_button1():
         def __init__(self):
             pygame.sprite.Sprite.__init__(self)
             self.image_orig = random.choice(meteor_images)
+            # set_colorkey() говорит pygame игнорировать любые пиксели конкретного цвета
             self.image_orig.set_colorkey(BLACK)
             self.image = self.image_orig.copy()
             self.rect = self.image.get_rect()
@@ -574,7 +577,7 @@ def click_button2():
     OFFSCREEN_SPACE = 300
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 600
-    SCREEN_TITLE = "Asteroid Smasher"
+    SCREEN_TITLE = "Asteroid Snaper"
     LEFT_LIMIT = -OFFSCREEN_SPACE
     RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
     BOTTOM_LIMIT = -OFFSCREEN_SPACE
